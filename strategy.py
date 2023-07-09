@@ -1,6 +1,6 @@
 ### PATRON DE DISEÑO STRATEGY ###
-# 
-# 
+# En esta version se utiliza inyeccion de dependencias para desacoplar estrategia y contexto,
+# sin embargo, en caso de compartir informacion, tal vez sea buena idea acoplar informacion comun
 
 from abc import ABC, abstractmethod
 from random import randint
