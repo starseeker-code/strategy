@@ -1,6 +1,5 @@
 ### PATRON DE DISEÑO STRATEGY ###
-# En esta version se utiliza inyeccion de dependencias para desacoplar estrategia y contexto,
-# sin embargo, en caso de compartir informacion, tal vez sea buena idea acoplar informacion comun
+# En esta version se acopla la informacion necesaria entre contexto y las estrategias
 
 from abc import ABC, abstractmethod
 from random import randint
@@ -11,10 +10,6 @@ class IEstrategia(ABC):
     @abstractmethod
     def algoritmo(self):
         ...
-        
-    def __init__(self, nombre, tiempo=12):
-        self.nombre = nombre
-        self.tiempo = tiempo
         
 # 2 - Se crean las estrategias
 
@@ -38,10 +33,10 @@ class Taxi(IEstrategia):
 
 class Contexto:
     def __init__(self, nombre, tiempo, dinero=100, *, estrategia):  # Se tiene una referencia de la estrategia
-        self.nombre = nombre
-        self.dinero = dinero
-        self.tiempo = tiempo
         self._estrategia = estrategia
+        self.nombre = self._estrategia.nombre = nombre  # Se pasa la info necesaria de contexto a estrategia
+        self.dinero = dinero
+        self.tiempo = self._estrategia.tiempo = tiempo
         
     @property  # Se mantiene la referencia de la estrategia
     def estrategia(self):
@@ -50,6 +45,8 @@ class Contexto:
     @estrategia.setter  # Se puede cambiar en runtime la estrategia
     def estrategia(self, nueva_estrategia):
         self._estrategia = nueva_estrategia
+        self._estrategia.nombre = self.nombre  # Se actualiza la informacion tambien
+        self._estrategia.tiempo = 12
     
     def elegir_transporte(self):  # Se ejecuta la estrategia
         result = self._estrategia.algoritmo()
@@ -61,8 +58,8 @@ if __name__ == '__main__':
     nombre = input("Nombre de la persona: ")
     tiempo = randint(12, 70)
     print(f"{nombre} tiene 100 € y necesita llegar al aeropuerto en {tiempo} minutos")
-    contexto = Contexto(nombre, tiempo, estrategia=Bicicleta(nombre, tiempo))  # En esta version hay inyeccion de dependencias
+    contexto = Contexto(nombre, tiempo, estrategia=Bicicleta())  # En esta version no hay inyeccion de dependencias
     contexto.elegir_transporte()
     print("En caso de elegir un taxi para volver...")
-    contexto.estrategia = Taxi(nombre)  # La inyeccion de dependencias desacopla pero no es conveniente
+    contexto.estrategia = Taxi()
     contexto.elegir_transporte()
