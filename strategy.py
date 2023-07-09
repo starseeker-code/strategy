@@ -12,9 +12,10 @@ class IEstrategia(ABC):
     def algoritmo(self):
         ...
         
-    def __init__(self, nombre, tiempo=12):
+    def __init__(self, nombre, tiempo=12, dinero=100):
         self.nombre = nombre
         self.tiempo = tiempo
+        self.dinero = dinero
         
 # 2 - Se crean las estrategias
 
@@ -24,15 +25,21 @@ class Andar(IEstrategia):  # Cada estrategia contiene un algoritmo concreto
         
 class Bicicleta(IEstrategia):
     def algoritmo(self):
+        self.dinero -= 10
         print(f"{self.nombre} alquilara una bibicleta, y llegara con {self.tiempo - 45} minutos extra")
+        print(f"A {self.nombre} le quedan {self.dinero}€")
         
 class Coche(IEstrategia):
     def algoritmo(self):
+        self.dinero -= 25
         print(f"{self.nombre} alquilara un coche, y llegara con {self.tiempo - 25} minutos extra")
+        print(f"A {self.nombre} le quedan {self.dinero}€")
         
 class Taxi(IEstrategia):
     def algoritmo(self):
+        self.dinero -= 35
         print(f"{self.nombre} utilizara un taxi, y llegara con {self.tiempo - 12} minutos extra")
+        print(f"A {self.nombre} le quedan {self.dinero}€")
 
 # 3 - Se crea la interfaz de contexto
 
@@ -59,10 +66,10 @@ class Contexto:
     
 if __name__ == '__main__':
     nombre = input("Nombre de la persona: ")
-    tiempo = randint(12, 70)
+    tiempo = randint(12, 50)
     print(f"{nombre} tiene 100 € y necesita llegar al aeropuerto en {tiempo} minutos")
-    contexto = Contexto(nombre, tiempo, estrategia=Bicicleta(nombre, tiempo))  # En esta version hay inyeccion de dependencias
+    contexto = Contexto(nombre, tiempo, estrategia=Coche(nombre, tiempo))  # En esta version hay inyeccion de dependencias
     contexto.elegir_transporte()
     print("En caso de elegir un taxi para volver...")
-    contexto.estrategia = Taxi(nombre)  # La inyeccion de dependencias desacopla pero no es conveniente
+    contexto.estrategia = Taxi(nombre, dinero=contexto._estrategia.dinero)  # La inyeccion de dependencias desacopla pero no es conveniente
     contexto.elegir_transporte()
