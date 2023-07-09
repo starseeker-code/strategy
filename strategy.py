@@ -1,5 +1,6 @@
 ### PATRON DE DISEÑO STRATEGY ###
-# En esta version se acopla la informacion necesaria entre contexto y las estrategias
+# En esta version se incuye un selector en runtime en la clase de contexto,
+# de forma que se elije una estrategia adecuada automaticamente
 
 from abc import ABC, abstractmethod
 from random import randint
@@ -32,11 +33,13 @@ class Taxi(IEstrategia):
 # 3 - Se crea la interfaz de contexto
 
 class Contexto:
-    def __init__(self, nombre, tiempo, dinero=100, *, estrategia):  # Se tiene una referencia de la estrategia
-        self._estrategia = estrategia
-        self.nombre = self._estrategia.nombre = nombre  # Se pasa la info necesaria de contexto a estrategia
+    def __init__(self, nombre, tiempo, dinero=100):  # Se tiene una referencia de la estrategia
+        self.nombre = nombre  # Se pasa la info necesaria de contexto a estrategia
         self.dinero = dinero
-        self.tiempo = self._estrategia.tiempo = tiempo
+        self.tiempo = tiempo
+        self._estrategia = self.elegir_estrategia()
+        self._estrategia.nombre = nombre
+        self._estrategia.tiempo = tiempo
         
     @property  # Se mantiene la referencia de la estrategia
     def estrategia(self):
@@ -46,20 +49,33 @@ class Contexto:
     def estrategia(self, nueva_estrategia):
         self._estrategia = nueva_estrategia
         self._estrategia.nombre = self.nombre  # Se actualiza la informacion tambien
-        self._estrategia.tiempo = 12
+        self._estrategia.tiempo = 60  # !Override manual para que quede bonito
     
     def elegir_transporte(self):  # Se ejecuta la estrategia
         result = self._estrategia.algoritmo()
         return result
+    
+    def elegir_estrategia(self):  # Selector que elige automaticamente la estrategia
+        if tiempo < 25:
+            estrategia = Taxi()
+            self.dinero -= 35
+        elif tiempo < 45:
+            estrategia = Coche()
+            self.dinero -= 25
+        elif tiempo < 60:
+            estrategia = Bicicleta()
+            self.dinero -= 10
+        else: estrategia = Andar()
+        return estrategia
 
-    
-    
+
 if __name__ == '__main__':
     nombre = input("Nombre de la persona: ")
     tiempo = randint(12, 70)
     print(f"{nombre} tiene 100 € y necesita llegar al aeropuerto en {tiempo} minutos")
-    contexto = Contexto(nombre, tiempo, estrategia=Bicicleta())  # En esta version no hay inyeccion de dependencias
+    contexto = Contexto(nombre, tiempo)  # En esta version no hay inyeccion de dependencias
     contexto.elegir_transporte()
-    print("En caso de elegir un taxi para volver...")
-    contexto.estrategia = Taxi()
+    print(f"A {contexto.nombre} le quedan {contexto.dinero}€")  # Asi es facil manejar los estados del contexto
+    print("En caso de elegir andar para volver...")
+    contexto.estrategia = Andar()  # Que haya un selector no impide que se utilice una estrategia concreta
     contexto.elegir_transporte()
