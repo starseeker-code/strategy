@@ -1,6 +1,6 @@
 ### PATRON DE DISEÑO STRATEGY ###
-# En esta version se incuye un selector en runtime en la clase de contexto,
-# de forma que se elije una estrategia adecuada automaticamente
+# Esta es la version "oficial" de refactoring.guru con un algoritmo para
+# seleccionar estrategias automaticamente, corresponde a V3
 
 from abc import ABC, abstractmethod
 from random import randint
