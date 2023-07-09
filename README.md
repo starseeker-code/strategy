@@ -1,4 +1,4 @@
-# Patron de diseño - Fabrica
+# Patron de diseño - Estrategia
 
 [Documentacion](https://refactoring.guru/design-patterns/factory-method)
 
